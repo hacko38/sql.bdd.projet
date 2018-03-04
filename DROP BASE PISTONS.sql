@@ -17,6 +17,10 @@ DROP PROCEDURE DemarrerLot
 DROP PROCEDURE Categorisation
 DROP PROCEDURE Liberer_presse
 DROP PROCEDURE ArretLot
+DROP PROCEDURE Supprimer_machine
+DROP PROCEDURE Rehabiliter_machine
+DROP PROCEDURE Supprimer_modele
+DROP PROCEDURE Rehabiliter_Modele
 go
 
 DROP VIEW VueStocksCategorie
@@ -90,4 +94,3 @@ DROP TYPE TypeModele
 
 DROP TYPE TypePieceLot
 go
-

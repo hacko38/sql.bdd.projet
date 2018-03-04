@@ -721,6 +721,154 @@ declare @code_retour int;
 	end catch
 return @code_retour
 go
+
+--Procedure Supprimer_Machine
+CREATE PROCEDURE [dbo].[Supprimer_machine] @Num_Presse smallint,
+								 @message varchar(200) output	
+as
+declare @code_retour int;
+	begin try
+		--Verification si le numéro de presse n'est pas null
+		if @Num_Presse is null
+			begin
+				set @message = 'Numéro de presse invalide';
+				set @code_retour = 1;
+			end
+		--Verification si la presse existe
+		else if not exists (select Num_Presse from MACHINE where Num_Presse = @Num_Presse )
+			begin
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' n'' existe pas';
+				set @code_retour = 2;
+			end
+		--Suppression de la presse avec valeur à 1 pour "Supprimer"
+		else
+			begin
+				update MACHINE
+				set Supprimée = 1
+				where Num_Presse = @Num_Presse;
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été supprimée'
+				set @code_retour = 0
+				
+			end
+	end try
+	begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @code_retour=3;
+	end catch
+return @code_retour
+go
+
+
+--Procédure Réhabiliter_Machine
+CREATE PROCEDURE [dbo].[Rehabiliter_machine] @Num_Presse smallint,
+								 @message varchar(200) output	
+as
+declare @code_retour int;
+	begin try
+		--Verification si le numéro de presse n'est pas null
+		if @Num_Presse is null
+			begin
+				set @message = 'Numéro de presse invalide';
+				set @code_retour = 1;
+			end
+		--Verification si la presse existe
+		else if not exists (select Num_Presse from MACHINE where Num_Presse = @Num_Presse )
+			begin
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' n'' existe pas';
+				set @code_retour = 2;
+			end
+		--Suppression de la presse avec valeur à 1 pour "Supprimer"
+		else
+			begin
+				update MACHINE
+				set Supprimée = 0
+				where Num_Presse = @Num_Presse;
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été réhabilitée'
+				set @code_retour = 0
+				
+			end
+	end try
+	begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @code_retour=3;
+	end catch
+return @code_retour
+go
+
+
+--Procédure Supprimer_Modele
+CREATE PROCEDURE [dbo].[Supprimer_modele] @m_Modele TypeModele,
+								 @message varchar(200) output	
+as
+declare @code_retour int;
+	begin try
+		--Verification si le modèle n'est pas null
+		if @m_Modele is null
+			begin
+				set @message = 'Modèle invalide';
+				set @code_retour = 1;
+			end
+		--Verification si le modèle existe
+		else if not exists (select Modele from MODELE where Modele = @m_Modele )
+			begin
+				set @message = 'Le modèle ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
+				set @code_retour = 2;
+			end
+		--Suppression du modèle avec valeur à 1 pour "Supprimer"
+		else
+			begin
+				update MODELE
+				set Supprimée = 1
+				where Modele = @m_Modele;
+				set @message = 'Le Modèle ' + CONVERT (varchar(10),@m_Modele) + ' a été supprimée'
+				set @code_retour = 0
+				
+			end
+	end try
+	begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @code_retour=3;
+	end catch
+return @code_retour
+go
+
+
+--Procédure Réhabiliter_Modele
+CREATE PROCEDURE [dbo].[Rehabiliter_Modele] @m_Modele TypeModele,
+								 @message varchar(200) output	
+as
+declare @code_retour int;
+	begin try
+		--Verification si le modèle n'est pas null
+		if @m_Modele is null
+			begin
+				set @message = 'Modèle invalide';
+				set @code_retour = 1;
+			end
+		--Verification si le modèle existe
+		else if not exists (select Modele from MODELE where Modele = @m_Modele )
+			begin
+				set @message = 'Le modèle ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
+				set @code_retour = 2;
+			end
+		--Suppression du modèle avec valeur à 1 pour "Supprimer"
+		else
+			begin
+				update MODELE
+				set Supprimée = 0
+				where Modele = @m_Modele;
+				set @message = 'Le Modèle ' + CONVERT (varchar(10),@m_Modele) + ' a été réhabilité'
+				set @code_retour = 0
+				
+			end
+	end try
+	begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @code_retour=3;
+	end catch
+return @code_retour
+go
+
 /*------------------------------------------------------------
 -- Creation des Vues
 ------------------------------------------------------------*/
@@ -824,5 +972,3 @@ declare @message varchar(50);
 select @idlot = LOT.Id_Lot from inserted JOIN LOT on inserted.Id_Lot = LOT.Id_Lot
 EXEC dbo.CreerCumul @idlot, @message;
 go
-
-

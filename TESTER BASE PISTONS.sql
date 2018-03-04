@@ -85,7 +85,3 @@ DECLARE @categ varchar(5);
 SELECT @categ = dbo.fn_CategoriserPiece(5, 5.09 , 5.09 , 5 , 5.09 )--diambase, HL,HT,BL,BT
 PRINT @categ
 GO
-
-
-
-
