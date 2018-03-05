@@ -5,7 +5,7 @@ go
 --Procedure Stockée LancerLot
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = LancerLot 1,100,'R4',@msgRet OUTPUT --Etat Lot, NbPièces à produire, Modele
+EXEC @ret = LancerLot 1,100,'R8',@msgRet OUTPUT --Etat Lot, NbPièces à produire, Modele
 PRINT @msgRet
 PRINT @ret
 GO
@@ -63,10 +63,50 @@ GO
 --Procedure Ajouter Machine
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = Ajouter_machine 1003,@msgRet OUTPUT --NumPresse
+EXEC @ret = Ajouter_machine 1004,@msgRet OUTPUT --NumPresse
 PRINT @msgRet
 PRINT @ret
 GO
+
+--Procedure Stockée SupprimerMachine
+Declare @msgRet varchar(100)
+Declare @ret int
+exec @ret = Supprimer_Machine 1004, @msgRet OUTPUT 
+Print @msgRet
+Print @ret
+Go
+
+--Procedure Stockée RéhabiliterMachine
+Declare @msgRet varchar(100)
+Declare @ret int
+exec @ret = Rehabiliter_Machine 1004, @msgRet OUTPUT 
+Print @msgRet
+Print @ret
+Go
+
+--Procedure Stockée Ajouter Modèle
+Declare @msgRet varchar(200);
+Declare @ret int ;
+exec @ret =  Ajouter_modele 'Megane' , 21 , @msgRet OUTPUT;
+Print @msgRet
+Print @ret
+
+
+--Procedure Stockée SupprimerModèle
+Declare @msgRet varchar(100)
+Declare @ret int
+exec @ret = Supprimer_modele CX8, @msgRet OUTPUT 
+Print @msgRet
+Print @ret
+Go
+
+--Procedure Stockée RéhabiliterModèle
+Declare @msgRet varchar(100)
+Declare @ret int
+exec @ret = Rehabiliter_Modele CX3, @msgRet OUTPUT 
+Print @msgRet
+Print @ret
+Go
 
 ----VUES----
 --Vue Stock
@@ -84,4 +124,10 @@ GO
 DECLARE @categ varchar(5);
 SELECT @categ = dbo.fn_CategoriserPiece(5, 5.09 , 5.09 , 5 , 5.09 )--diambase, HL,HT,BL,BT
 PRINT @categ
+GO
+
+--fonction Getrole
+DECLARE @role varchar(50);
+SELECT @role = dbo.fn_GetRole()
+PRINT @role
 GO

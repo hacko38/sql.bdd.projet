@@ -132,52 +132,14 @@ CREATE TABLE CUMUL(
 );
 go
 
-/*------------------------------------------------------------
--- Creation des USER et ROLES
-------------------------------------------------------------*/
-CREATE ROLE CONTROLEUR;
-CREATE ROLE RESP_ATELIER;
-CREATE ROLE RESP_PRODUCTION;
-CREATE ROLE RESP_QUALITE;
-CREATE ROLE RESP_APPLI;
-CREATE ROLE MAGASINIER
-go
-
-CREATE LOGIN resp_appli WITH PASSWORD ='resp_appli';
-CREATE LOGIN resp_atelier1 WITH PASSWORD ='resp_atelier1';
-CREATE LOGIN resp_atelier2	WITH PASSWORD ='resp_atelier2';
-CREATE LOGIN resp_production1 WITH PASSWORD ='resp_production1';
-CREATE LOGIN resp_production2 WITH PASSWORD ='resp_production2';
-CREATE LOGIN controleur1 WITH PASSWORD ='controleur1';
-CREATE LOGIN controleur2 WITH PASSWORD ='controleur2';
-CREATE LOGIN controleur3 WITH PASSWORD ='controleur3';
-CREATE LOGIN magasinier1 WITH PASSWORD ='magasinier1';
-CREATE LOGIN magasinier2 WITH PASSWORD ='magasinier2';
-CREATE LOGIN magasinier3 WITH PASSWORD ='magasinier3';
-CREATE LOGIN resp_qualité1 WITH PASSWORD ='resp_qualité1';
-CREATE LOGIN resp_qualité2 WITH PASSWORD ='resp_qualité2';
-go
 
 
-
-
-CREATE USER ederson FROM login resp_appli;
-CREATE USER walker FROM login resp_atelier1;
-CREATE USER kompany	FROM login resp_atelier2;
-CREATE USER otamendi FROM login resp_production1;
-CREATE USER danilo FROM login resp_production2;
-CREATE USER debruyne FROM login controleur1;
-CREATE USER gundogan FROM login controleur2;
-CREATE USER dsilva FROM login controleur3;
-CREATE USER bsilva FROM login magasinier1;
-CREATE USER sane FROM login magasinier2;
-CREATE USER sterling FROM login magasinier3;
-CREATE USER aguero FROM login resp_qualité1;
-CREATE USER guardiola FROM login resp_qualité2;
-go
-
-ALTER ROLE RESP_APPLI ADD MEMBER ederson
-go
+/*SELECT role.name AS RoleName
+FROM sys.server_role_members  
+JOIN sys.server_principals AS role  
+    ON sys.server_role_members.role_principal_id = role.principal_id  
+JOIN sys.server_principals AS member  
+    ON sys.server_role_members.member_principal_id = member.principal_id; */
 
 /*------------------------------------------------------------
 -- Creation des PROCEDURES
@@ -723,8 +685,8 @@ return @code_retour
 go
 
 --Procedure Supprimer_Machine
-CREATE PROCEDURE [dbo].[Supprimer_machine] @Num_Presse smallint,
-								 @message varchar(200) output	
+CREATE PROCEDURE Supprimer_machine		@Num_Presse smallint,
+										@message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
@@ -760,8 +722,8 @@ go
 
 
 --Procédure Réhabiliter_Machine
-CREATE PROCEDURE [dbo].[Rehabiliter_machine] @Num_Presse smallint,
-								 @message varchar(200) output	
+CREATE PROCEDURE Rehabiliter_machine	@Num_Presse smallint,
+										@message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
@@ -797,8 +759,8 @@ go
 
 
 --Procédure Supprimer_Modele
-CREATE PROCEDURE [dbo].[Supprimer_modele] @m_Modele TypeModele,
-								 @message varchar(200) output	
+CREATE PROCEDURE Supprimer_modele	@m_Modele TypeModele,
+									@message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
@@ -834,8 +796,8 @@ go
 
 
 --Procédure Réhabiliter_Modele
-CREATE PROCEDURE [dbo].[Rehabiliter_Modele] @m_Modele TypeModele,
-								 @message varchar(200) output	
+CREATE PROCEDURE Rehabiliter_Modele	 @m_Modele TypeModele,
+									 @message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
@@ -869,6 +831,40 @@ declare @code_retour int;
 return @code_retour
 go
 
+--ajouter un modele avec son diametre
+CREATE PROCEDURE Ajouter_modele @Modele TypeModele,
+								@Diametre TypeDiametre,
+								@message varchar(200) output	
+as
+declare @code_retour int;
+	begin try
+		--Verification si le modèle ou le diamètre n'est pas null
+		if @Modele is null or @Diametre is null
+			begin
+				set @message = 'Modèle et/ou diamètre incorrect';
+				set @code_retour = 1;
+			end
+		--Verification si le modéle existe déjà
+		else if exists (select Modele from MODELE where Modele = @Modele )
+			begin
+				set @message = 'Le modèle ' + CONVERT (varchar(10),@Modele) + ' existe déjà';
+				set @code_retour = 2;
+			end
+		--Ajout du modèle avec son diamètre
+		else
+			begin
+				insert MODELE values (@Modele , @Diametre, 0);
+				set @message = 'Le modèle ' + CONVERT (varchar(10),@Modele) + ' avec un diamètre de ' + CONVERT (varchar(10),@Diametre) + ' a été ajouté';
+				set @code_retour = 0;
+			end
+	end try
+	begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @code_retour=3;
+	end catch
+return @code_retour
+go
+
 /*------------------------------------------------------------
 -- Creation des Vues
 ------------------------------------------------------------*/
@@ -883,8 +879,9 @@ from STOCK
 where Seuil_Mini>=Quantite_Stock
 GO
 
-CREATE VIEW VueEtatPresse AS SELECT *
+CREATE VIEW VueEtatPresse AS SELECT Num_Presse, Etat_Presse
 from MACHINE
+where Supprimée = 0
 GO
 
 /*------------------------------------------------------------
@@ -944,6 +941,38 @@ BEGIN
 	
 
 	RETURN @categorie
+END
+GO
+
+--fontion qui retourne le role de l'utilisateur courant
+CREATE FUNCTION fn_GetRole ()
+RETURNS varchar(50)
+AS
+BEGIN
+--Variable login et mdp
+DECLARE @login NVARCHAR(256), @user NVARCHAR(256), @role varchar(20);
+
+--recuperation du login courant
+SELECT @login = login_name FROM sys.dm_exec_sessions WHERE session_id = @@SPID;
+
+--recuperation de l'user à partir du login
+SELECT @user = d.name
+  FROM sys.database_principals AS d
+  INNER JOIN sys.server_principals AS s
+  ON d.sid = s.sid
+  WHERE s.name = @login;
+
+
+SELECT @role = r.name
+  FROM sys.database_role_members AS m
+  INNER JOIN sys.database_principals AS r
+  ON m.role_principal_id = r.principal_id
+  INNER JOIN sys.database_principals AS u
+  ON u.principal_id = m.member_principal_id
+  WHERE u.name = @user;
+	
+
+	RETURN @role
 END
 GO
 

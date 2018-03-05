@@ -6,8 +6,10 @@ DROP TRIGGER TriggerCumul
 go
 
 DROP FUNCTION fn_CategoriserPiece
+DROP FUNCTION fn_GetRole
 go
 
+DROP PROCEDURE Ajouter_modele
 DROP PROCEDURE Ajouter_machine
 DROP PROCEDURE CreerCumul
 DROP PROCEDURE LancerLot
@@ -28,21 +30,22 @@ DROP VIEW VueRuptureStock
 DROP VIEW VueEtatPresse
 go
 
-DROP USER ederson
-DROP USER walker
-DROP USER kompany
-DROP USER otamendi 
-DROP USER danilo 
-DROP USER debruyne 
-DROP USER gundogan 
-DROP USER dsilva 
-DROP USER bsilva 
-DROP USER sane 
-DROP USER sterling 
-DROP USER aguero 
-DROP USER guardiola
+DROP USER uresp_appli 
+DROP USER uresp_atelier1
+DROP USER uresp_atelier2	
+DROP USER uresp_production1
+DROP USER uresp_production2
+DROP USER ucontroleur1 
+DROP USER ucontroleur2 
+DROP USER ucontroleur3
+DROP USER umagasinier1 
+DROP USER umagasinier2 
+DROP USER umagasinier3 
+DROP USER uresp_qualité1
+DROP USER uresp_qualité2
 go
 
+/*
 DROP LOGIN resp_appli
 DROP LOGIN resp_atelier1
 DROP LOGIN resp_atelier2
@@ -57,6 +60,7 @@ DROP LOGIN magasinier3
 DROP LOGIN resp_qualité1
 DROP LOGIN resp_qualité2
 go
+*/
 
 DROP ROLE CONTROLEUR
 DROP ROLE RESP_ATELIER
@@ -64,6 +68,7 @@ DROP ROLE RESP_PRODUCTION
 DROP ROLE RESP_QUALITE
 DROP ROLE RESP_APPLI
 DROP ROLE MAGASINIER
+DROP ROLE BASE
 go
 
 DROP TABLE CUMUL
