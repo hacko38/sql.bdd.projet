@@ -879,9 +879,18 @@ from STOCK
 where Seuil_Mini>=Quantite_Stock
 GO
 
+--Vue des états presse
 CREATE VIEW VueEtatPresse AS SELECT Num_Presse, Etat_Presse
 from MACHINE
 where Supprimée = 0
+GO
+
+--Vue des lots avec leurs états
+CREATE VIEW VueLotPresse 
+AS SELECT LOT.Id_Lot, ETAT_LOT.Nom_Etat, MACHINE.Num_Presse
+from LOT 
+join ETAT_LOT on LOT.Code_Etat = ETAT_LOT.Code_Etat
+LEFT JOIN MACHINE on LOT.Num_Presse = MACHINE.Num_Presse
 GO
 
 /*------------------------------------------------------------
@@ -979,9 +988,7 @@ GO
 --Procedure qui appelle la fonction GetRole
 CREATE PROCEDURE ps_GetRole		@role varchar(30) output
 as
-	SELECT @role = dbo.fn_GetRole()
-
-
+	SELECT @role = dbo.fn_GetRole();
 go
 
 /*------------------------------------------------------------
@@ -1009,3 +1016,4 @@ declare @message varchar(50);
 select @idlot = LOT.Id_Lot from inserted JOIN LOT on inserted.Id_Lot = LOT.Id_Lot
 EXEC dbo.CreerCumul @idlot, @message;
 go
+

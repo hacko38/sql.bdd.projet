@@ -5,7 +5,7 @@ go
 --Procedure Stockée LancerLot
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = LancerLot 1,100,'R8',@msgRet OUTPUT --Etat Lot, NbPièces à produire, Modele
+EXEC @ret = LancerLot 1,100,'R4',@msgRet OUTPUT --Etat Lot, NbPièces à produire, Modele
 PRINT @msgRet
 PRINT @ret
 GO
@@ -110,8 +110,8 @@ Go
 
 --PROCEDURE Getrole
 DECLARE @role varchar(50);
-EXEC ps_GetRole @lerole output;
-print @lerole;
+EXEC ps_GetRole @role output;
+print @role;
 GO
 ----VUES----
 --Vue Stock
