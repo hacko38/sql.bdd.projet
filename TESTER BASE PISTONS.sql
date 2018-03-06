@@ -108,6 +108,11 @@ Print @msgRet
 Print @ret
 Go
 
+--PROCEDURE Getrole
+DECLARE @role varchar(50);
+EXEC ps_GetRole @lerole output;
+print @lerole;
+GO
 ----VUES----
 --Vue Stock
 SELECT * FROM VueStocksCategorie
@@ -126,8 +131,8 @@ SELECT @categ = dbo.fn_CategoriserPiece(5, 5.09 , 5.09 , 5 , 5.09 )--diambase, H
 PRINT @categ
 GO
 
---fonction Getrole
-DECLARE @role varchar(50);
-SELECT @role = dbo.fn_GetRole()
-PRINT @role
-GO
+
+
+--exec sp_helpuser hocine
+
+

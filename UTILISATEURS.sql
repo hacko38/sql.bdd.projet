@@ -52,21 +52,17 @@ go
 -- AFFECTATIONS DES DROITS AUX RÔLES
 grant SELECT on VueStocksCategorie to RESP_ATELIER;
 grant EXECUTE on LancerLot to RESP_ATELIER;
-grant EXECUTE on fn_GetRole to RESP_ATELIER;
 grant EXECUTE on DemarrerLot to RESP_PRODUCTION;
 grant EXECUTE on Liberer_presse to RESP_PRODUCTION;
-grant EXECUTE on fn_GetRole to RESP_PRODUCTION;
 grant EXECUTE on Categorisation to CONTROLEUR;
 grant EXECUTE on ArretLot to CONTROLEUR;
-grant EXECUTE on fn_GetRole to CONTROLEUR;
 grant EXECUTE on EntreeStock to MAGASINIER;
 grant EXECUTE on SortieStock to MAGASINIER;
-grant EXECUTE on fn_GetRole to MAGASINIER;
 grant EXECUTE on Ajouter_modele to RESP_APPLI;
 grant EXECUTE on Supprimer_modele to RESP_APPLI;
 grant EXECUTE on Ajouter_machine to RESP_APPLI;
 grant EXECUTE on Supprimer_machine to RESP_APPLI;
-grant EXECUTE on fn_GetRole to RESP_APPLI;
+grant EXECUTE on ps_GetRole to public;
 /*grant EXECUTE on changeLimit to RESP_APPLI;
 grant EXECUTE on pieceCleanUp to RESP_APPLI;*/
 

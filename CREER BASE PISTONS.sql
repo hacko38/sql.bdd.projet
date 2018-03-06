@@ -293,10 +293,10 @@ begin try
 		set @codePlanning = 1;
 		set @message = 'Le paramètre "idlot" ne doit  pas être nul';
 	end
-	else if (SELECT LOT.Code_Etat from LOT where Id_Lot = @idlot) <> 2
+	else if (SELECT LOT.Code_Etat from LOT where Id_Lot = @idlot) <> 2 and (SELECT LOT.Code_Etat from LOT where Id_Lot = @idlot) <> 3
 	begin
 		set @codePlanning = 1;
-		set @message = 'Le lot n''est pas à l''état demarré';
+		set @message = 'Le lot doit être à l''état demarré ou libéré';
 	end
 
 	else if @diamBL is null or @diamBT is null or @diamHL is null or @diamHT is null
@@ -975,6 +975,14 @@ SELECT @role = r.name
 	RETURN @role
 END
 GO
+
+--Procedure qui appelle la fonction GetRole
+CREATE PROCEDURE ps_GetRole		@role varchar(30) output
+as
+	SELECT @role = dbo.fn_GetRole()
+
+
+go
 
 /*------------------------------------------------------------
 -- Creation des Triggers
