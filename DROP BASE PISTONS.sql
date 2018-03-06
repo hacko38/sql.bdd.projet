@@ -23,11 +23,13 @@ DROP PROCEDURE Supprimer_machine
 DROP PROCEDURE Rehabiliter_machine
 DROP PROCEDURE Supprimer_modele
 DROP PROCEDURE Rehabiliter_Modele
+DROP PROCEDURE ps_GetRole
 go
 
 DROP VIEW VueStocksCategorie
 DROP VIEW VueRuptureStock
 DROP VIEW VueEtatPresse
+DROP VIEW VueLotPresse
 go
 
 DROP USER uresp_appli 

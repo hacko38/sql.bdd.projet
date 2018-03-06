@@ -880,14 +880,15 @@ where Seuil_Mini>=Quantite_Stock
 GO
 
 --Vue des états presse
-CREATE VIEW VueEtatPresse AS SELECT Num_Presse, Etat_Presse
+CREATE VIEW VueEtatPresse (NumPresse, EtatPresse)
+AS SELECT Num_Presse, Etat_Presse
 from MACHINE
 where Supprimée = 0
 GO
 
 --Vue des lots avec leurs états
-CREATE VIEW VueLotPresse 
-AS SELECT LOT.Id_Lot, ETAT_LOT.Nom_Etat, MACHINE.Num_Presse
+CREATE VIEW VueLotPresse (Lot,EtatLot,NumPresse,CodeEtat)
+AS SELECT LOT.Id_Lot, ETAT_LOT.Nom_Etat, MACHINE.Num_Presse, LOT.Code_Etat
 from LOT 
 join ETAT_LOT on LOT.Code_Etat = ETAT_LOT.Code_Etat
 LEFT JOIN MACHINE on LOT.Num_Presse = MACHINE.Num_Presse

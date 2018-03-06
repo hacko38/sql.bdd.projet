@@ -124,6 +124,10 @@ GO
 SELECT * FROM VueEtatPresse
 GO
 
+--Vue LOT ET PRESSE 
+SELECT * FROM VueLotPresse
+GO
+
 ----FONCTIONS----
 --fonction categoriser
 DECLARE @categ varchar(5);
