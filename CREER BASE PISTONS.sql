@@ -182,10 +182,12 @@ begin try
 			end
 		else
 			begin
+			begin transaction
 				INSERT INTO LOT (Nb_Pieces_demandees,Modele,Code_Etat)
 				VALUES (@nbPièces,@modele,@etatlot)
 			set @codeRetour=0; --OK
 			Set @message='Demande de lancement de production pour ' + CONVERT (varchar (10), @nbPièces) + ' pièces ' + CONVERT (varchar (10), @modele);
+			commit transaction;
 			end
 	end
 	end try
@@ -193,6 +195,7 @@ begin try
 		--KO erreur base de données
 		Set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
+		rollback transaction;
 	end catch
 RETURN (@codeRetour);
 go
@@ -376,7 +379,8 @@ declare @code_retour int;
 				set @code_retour = 2;		
 			end
 		else
-		begin	
+		begin
+		begin transaction	
 				--Passage de la presse en état "Libérée"
 				UPDATE MACHINE
 				set Etat_Presse = 0
@@ -390,12 +394,13 @@ declare @code_retour int;
 
 				set @message = 'La presse a été basculé en état "Libérée"' ;
 				set @code_retour = 0;
-			
+		commit transaction;	
 		end
 	end try	
 	begin catch
 		Set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return (@code_retour);
 go
@@ -524,6 +529,7 @@ begin try
 			end
 		else
 			begin
+			begin transaction
 				UPDATE STOCK
 				SET Quantite_Stock = Quantite_Stock-@nbPiècesSorties
 				WHERE Modele = @modele
@@ -531,6 +537,7 @@ begin try
 
 			set @codeRetour=0; --OK
 			set @message = 'Sortie de '+ CONVERT (varchar (10), @nbPiècesSorties) + ' pièces effectuée pour le modele ' + CONVERT (varchar (10), @modele) + ' catégorie ' + CONVERT (varchar (10), @categorie);
+			commit transaction;
 			end
 	end
 	end try
@@ -538,6 +545,7 @@ begin try
 		--KO erreur base de données
 		Set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
+		rollback transaction;
 	end catch
 RETURN (@codeRetour);
 go
@@ -588,6 +596,7 @@ begin try
 			end
 		else
 			begin
+			begin transaction
 				UPDATE STOCK
 				SET Quantite_Stock = Quantite_Stock+@nbPiècesEntrées
 				WHERE Modele = @modele
@@ -595,6 +604,7 @@ begin try
 
 			set @codeRetour=0; --OK
 			set @message = 'Entrée de '+ CONVERT (varchar (10), @nbPiècesEntrées) + ' pièces effectuée pour le modele ' + CONVERT (varchar (10), @modele) + ' catégorie ' + CONVERT (varchar (10), @categorie);
+			commit transaction;
 			end
 	end
 	end try
@@ -602,6 +612,7 @@ begin try
 		--KO erreur base de données
 		Set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
+		rollback transaction;
 	end catch
 RETURN (@codeRetour);
 go
@@ -672,14 +683,17 @@ declare @code_retour int;
 		--Ajout de la presse avec un état à 0
 		else
 			begin
+				begin transaction
 				insert MACHINE values (@Num_Presse , '0','0');
-				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été ajouté';
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été ajoutée';
 				set @code_retour = 0;
+				commit transaction;
 			end
 	end try
 	begin catch
 		set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return @code_retour
 go
@@ -705,17 +719,20 @@ declare @code_retour int;
 		--Suppression de la presse avec valeur à 1 pour "Supprimer"
 		else
 			begin
+				begin transaction
 				update MACHINE
 				set Supprimée = 1
 				where Num_Presse = @Num_Presse;
 				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été supprimée'
 				set @code_retour = 0
+				commit transaction;
 				
 			end
 	end try
 	begin catch
 		set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return @code_retour
 go
@@ -742,17 +759,20 @@ declare @code_retour int;
 		--Suppression de la presse avec valeur à 1 pour "Supprimer"
 		else
 			begin
+				begin transaction
 				update MACHINE
 				set Supprimée = 0
 				where Num_Presse = @Num_Presse;
 				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été réhabilitée'
 				set @code_retour = 0
+				commit transaction;
 				
 			end
 	end try
 	begin catch
 		set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return @code_retour
 go
@@ -779,17 +799,19 @@ declare @code_retour int;
 		--Suppression du modèle avec valeur à 1 pour "Supprimer"
 		else
 			begin
+			begin transaction
 				update MODELE
 				set Supprimée = 1
 				where Modele = @m_Modele;
 				set @message = 'Le Modèle ' + CONVERT (varchar(10),@m_Modele) + ' a été supprimée'
 				set @code_retour = 0
-				
+			commit transaction;
 			end
 	end try
 	begin catch
 		set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return @code_retour
 go
@@ -816,17 +838,19 @@ declare @code_retour int;
 		--Suppression du modèle avec valeur à 1 pour "Supprimer"
 		else
 			begin
+			begin transaction
 				update MODELE
 				set Supprimée = 0
 				where Modele = @m_Modele;
 				set @message = 'Le Modèle ' + CONVERT (varchar(10),@m_Modele) + ' a été réhabilité'
 				set @code_retour = 0
-				
+			commit transaction;	
 			end
 	end try
 	begin catch
 		set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return @code_retour
 go
@@ -853,14 +877,17 @@ declare @code_retour int;
 		--Ajout du modèle avec son diamètre
 		else
 			begin
+			begin transaction
 				insert MODELE values (@Modele , @Diametre, 0);
 				set @message = 'Le modèle ' + CONVERT (varchar(10),@Modele) + ' avec un diamètre de ' + CONVERT (varchar(10),@Diametre) + ' a été ajouté';
 				set @code_retour = 0;
+			commit transaction;
 			end
 	end try
 	begin catch
 		set @message='erreur base de données' + ERROR_MESSAGE() ;
 		set @code_retour=3;
+		rollback transaction;
 	end catch
 return @code_retour
 go
