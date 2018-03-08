@@ -100,3 +100,4 @@ DROP TYPE TypeModele
 
 DROP TYPE TypePieceLot
 go
+
