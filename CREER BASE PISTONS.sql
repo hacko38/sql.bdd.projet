@@ -145,8 +145,7 @@ JOIN sys.server_principals AS member
 -- Creation des PROCEDURES
 ------------------------------------------------------------*/
 --Procedure de creation du lot à l'état lancé
-CREATE PROCEDURE LancerLot		@etatlot	tinyint,
-								@nbPièces	Int,
+ALTER PROCEDURE LancerLot		@nbPièces	Int,
 								@modele		TypeModele,
 								@message	varchar(100) OUTPUT
 
@@ -155,12 +154,7 @@ DECLARE @codeRetour int;
 
 
 begin try
-	if @etatlot is null or @etatlot <> 1
-	begin
-		set @codeRetour = 1;
-		set @message = 'Le lot doit être initialisé à l''état lancé';
-	end
-	else if @nbPièces is null or @nbPièces <= 0
+	if @nbPièces is null or @nbPièces <= 0
 	begin
 		set @codeRetour = 1;
 		set @message = 'Nb de pièces incohérent';
@@ -184,7 +178,7 @@ begin try
 			begin
 			begin transaction
 				INSERT INTO LOT (Nb_Pieces_demandees,Modele,Code_Etat)
-				VALUES (@nbPièces,@modele,@etatlot)
+				VALUES (@nbPièces,@modele,1)
 			set @codeRetour=0; --OK
 			Set @message='Demande de lancement de production pour ' + CONVERT (varchar (10), @nbPièces) + ' pièces ' + CONVERT (varchar (10), @modele);
 			commit transaction;

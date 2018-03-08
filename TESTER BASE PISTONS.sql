@@ -5,7 +5,7 @@ go
 --Procedure Stockée LancerLot
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = LancerLot 1,100,'R4',@msgRet OUTPUT --Etat Lot, NbPièces à produire, Modele
+EXEC @ret = LancerLot 100,'R4',@msgRet OUTPUT --Etat Lot, NbPièces à produire, Modele
 PRINT @msgRet
 PRINT @ret
 GO
