@@ -462,7 +462,7 @@ begin try
 			where Id_Lot = @idlot;
 			--renvoi code retour
 			Set @codeRetour = 0;
-			Set @message ='Les statistiques ont été mises à jour pour le lot ' + CONVERT (varchar (10), @idlot);
+			Set @message ='Le lot ' + CONVERT (varchar (10), @idlot) + 'est passé en état "Arrêté". Statistiques mises à jour';
 
 			commit transaction;
 		end
