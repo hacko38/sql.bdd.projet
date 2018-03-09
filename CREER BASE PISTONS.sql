@@ -145,7 +145,7 @@ JOIN sys.server_principals AS member
 -- Creation des PROCEDURES
 ------------------------------------------------------------*/
 --Procedure de creation du lot à l'état lancé
-ALTER PROCEDURE LancerLot		@nbPièces	Int,
+CREATE PROCEDURE LancerLot		@nbPièces	Int,
 								@modele		TypeModele,
 								@message	varchar(100) OUTPUT
 
@@ -178,7 +178,7 @@ begin try
 			begin
 			begin transaction
 				INSERT INTO LOT (Nb_Pieces_demandees,Modele,Code_Etat)
-				VALUES (@nbPièces,@modele,1)
+				VALUES (@nbPièces,@modele,'1')
 			set @codeRetour=0; --OK
 			Set @message='Demande de lancement de production pour ' + CONVERT (varchar (10), @nbPièces) + ' pièces ' + CONVERT (varchar (10), @modele);
 			commit transaction;
