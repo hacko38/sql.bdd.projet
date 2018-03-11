@@ -30,6 +30,7 @@ DROP VIEW VueStocksCategorie
 DROP VIEW VueRuptureStock
 DROP VIEW VueEtatPresse
 DROP VIEW VueLotPresse
+DROP VIEW VueTousLots
 go
 
 DROP USER uresp_appli 

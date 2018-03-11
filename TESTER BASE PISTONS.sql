@@ -128,6 +128,10 @@ GO
 SELECT * FROM VueLotPresse
 GO
 
+--Vue TOUS LOTS
+SELECT * FROM VueTousLots
+GO
+
 ----FONCTIONS----
 --fonction categoriser
 DECLARE @categ varchar(5);

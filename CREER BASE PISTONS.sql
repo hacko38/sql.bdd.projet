@@ -101,7 +101,8 @@ CREATE TABLE STOCK(
 	Categorie      TypeCategorie  REFERENCES CATEGORIE(Categorie),
 	PRIMARY KEY (Modele, Categorie),
 	Quantite_Stock INT   ,
-	Seuil_Mini     INT   
+	Seuil_Mini     INT ,
+	DateDerniereCommande VARCHAR(50)  
 );
 go
 
@@ -179,6 +180,12 @@ begin try
 			begin transaction
 				INSERT INTO LOT (Nb_Pieces_demandees,Modele,Code_Etat)
 				VALUES (@nbPièces,@modele,'1')
+
+				--Maj du commentaire Stock
+				UPDATE dbo.STOCK
+				set DateDerniereCommande = CONVERT(varchar(2), DAY(GETDATE()))+'/'+CONVERT(varchar(2), MONTH(GETDATE()))+'/'+CONVERT(varchar(4),YEAR(GETDATE()))
+				where STOCK.Modele = @modele;
+
 			set @codeRetour=0; --OK
 			Set @message='Demande de lancement de production pour ' + CONVERT (varchar (10), @nbPièces) + ' pièces ' + CONVERT (varchar (10), @modele);
 			commit transaction;
@@ -886,12 +893,25 @@ declare @code_retour int;
 return @code_retour
 go
 
+--Procedure qui appelle la fonction GetRole
+CREATE PROCEDURE ps_GetRole		@role varchar(30) output
+as
+	SELECT @role = dbo.fn_GetRole();
+go
+
+
+
 /*------------------------------------------------------------
 -- Creation des Vues
 ------------------------------------------------------------*/
 --Vue concernant les stocks
-CREATE VIEW VueStocksCategorie AS SELECT *
+CREATE VIEW VueStocksCategorie (Modele,Categorie,QuantitéStock,SeuilMini,DerniereCommande)
+AS SELECT *
 from STOCK
+GO
+
+CREATE VIEW VueTousLots AS SELECT *
+from LOT
 GO
 
 --Vue concernant les ruptures de stock
@@ -1007,11 +1027,7 @@ SELECT @role = r.name
 END
 GO
 
---Procedure qui appelle la fonction GetRole
-CREATE PROCEDURE ps_GetRole		@role varchar(30) output
-as
-	SELECT @role = dbo.fn_GetRole();
-go
+
 
 /*------------------------------------------------------------
 -- Creation des Triggers
