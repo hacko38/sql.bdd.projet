@@ -55,7 +55,7 @@ GO
 --Entrée des stocks pour tests
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = EntreeStock 400,'MOYEN','R4',@msgRet OUTPUT --NbPièces à sortir, Categorie, Modele
+EXEC @ret = EntreeStock 400,'MOYEN','R4',@msgRet OUTPUT --NbPièces à entrer, Categorie, Modele
 PRINT @msgRet
 PRINT @ret
 GO

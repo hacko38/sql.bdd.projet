@@ -57,6 +57,7 @@ grant EXECUTE on DemarrerLot to RESP_PRODUCTION;
 grant EXECUTE on Liberer_presse to RESP_PRODUCTION;
 grant EXECUTE on Categorisation to CONTROLEUR;
 grant EXECUTE on ArretLot to CONTROLEUR;
+grant SELECT on VueStocksCategorie to MAGASINIER;
 grant EXECUTE on EntreeStock to MAGASINIER;
 grant EXECUTE on SortieStock to MAGASINIER;
 grant EXECUTE on Ajouter_modele to RESP_APPLI;
