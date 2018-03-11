@@ -52,6 +52,7 @@ go
 grant SELECT on VueStocksCategorie to RESP_ATELIER;
 grant SELECT on VueTousLots to RESP_ATELIER;
 grant EXECUTE on LancerLot to RESP_ATELIER;
+grant EXECUTE on ps_LotsSelect to RESP_ATELIER;
 grant EXECUTE on DemarrerLot to RESP_PRODUCTION;
 grant EXECUTE on Liberer_presse to RESP_PRODUCTION;
 grant EXECUTE on Categorisation to CONTROLEUR;

@@ -113,6 +113,16 @@ DECLARE @role varchar(50);
 EXEC ps_GetRole @role output;
 print @role;
 GO
+
+--PROCEDURE LOTSSELECT
+DECLARE @ret int;
+DECLARE @msgret varchar(100);
+EXEC @ret = ps_LotsSelect 'R4', @msgret OUTPUT
+PRINT @msgret
+PRINT @ret
+go
+
+
 ----VUES----
 --Vue Stock
 SELECT * FROM VueStocksCategorie

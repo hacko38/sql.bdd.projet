@@ -7,6 +7,7 @@ go
 
 DROP FUNCTION fn_CategoriserPiece
 DROP FUNCTION fn_GetRole
+DROP FUNCTION fn_LotsSelect
 go
 
 DROP PROCEDURE Ajouter_modele
@@ -24,6 +25,7 @@ DROP PROCEDURE Rehabiliter_machine
 DROP PROCEDURE Supprimer_modele
 DROP PROCEDURE Rehabiliter_Modele
 DROP PROCEDURE ps_GetRole
+DROP PROCEDURE ps_LotsSelect
 go
 
 DROP VIEW VueStocksCategorie

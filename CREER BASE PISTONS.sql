@@ -899,6 +899,40 @@ as
 	SELECT @role = dbo.fn_GetRole();
 go
 
+CREATE PROCEDURE ps_LotsSelect		@modele TypeModele,
+									@message varchar(100) output
+as
+DECLARE @coderetour int;
+begin try
+	if @modele is null
+	begin
+		set @coderetour = 1;
+		set @message = 'Le paramètre "modele" ne doit  pas être nul';
+	end
+	else 
+	begin
+	--vérifier l'existence du modele--
+		if not EXISTS (select* from LOT where Modele = @modele)
+			begin
+				--lot inexistant--
+				Set @coderetour = 2;
+				Set @message ='Modele inexistant';
+			end
+		else
+		begin
+			SELECT * from fn_LotsSelect(@modele)
+		end
+	end
+end try
+begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @coderetour=3;
+end catch
+return @coderetour
+
+
+go
+
 
 
 /*------------------------------------------------------------
@@ -1026,6 +1060,12 @@ SELECT @role = r.name
 	RETURN @role
 END
 GO
+
+--Fonction qui retourne une table de lots en fonction du modele selectionné
+CREATE FUNCTION fn_LotsSelect (@modele TypeModele) RETURNS table
+AS
+RETURN (SELECT * FROM LOT WHERE Modele = @modele)
+go
 
 
 
