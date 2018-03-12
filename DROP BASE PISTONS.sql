@@ -26,6 +26,7 @@ DROP PROCEDURE Supprimer_modele
 DROP PROCEDURE Rehabiliter_Modele
 DROP PROCEDURE ps_GetRole
 DROP PROCEDURE ps_LotsSelect
+DROP PROCEDURE AnnulerLot
 go
 
 DROP VIEW VueStocksCategorie
@@ -33,6 +34,11 @@ DROP VIEW VueRuptureStock
 DROP VIEW VueEtatPresse
 DROP VIEW VueLotPresse
 DROP VIEW VueTousLots
+DROP VIEW VueLotsLances
+DROP VIEW VueLotsDemarres
+DROP VIEW VueRespProd
+DROP VIEW VueLots
+DROP VIEW VueEtatPresseDispo
 go
 
 DROP USER uresp_appli 

@@ -117,7 +117,8 @@ CREATE TABLE PIECE(
 	Diametre_BL TypeDiametre   ,
 	Diametre_BT TypeDiametre   ,
 	Categorie   TypeCategorie  REFERENCES CATEGORIE(Categorie),
-	Id_Lot      TypePieceLot	 REFERENCES LOT(Id_Lot)  
+	Id_Lot      TypePieceLot	 REFERENCES LOT(Id_Lot),
+	Commentaire varchar(100)  
 );
 
 
@@ -201,6 +202,56 @@ begin try
 RETURN (@codeRetour);
 go
 
+--Procedure d'annulation du lot lancé
+CREATE PROCEDURE AnnulerLot		@idlot		TypePieceLot,
+								@message	varchar(100) OUTPUT
+
+AS
+DECLARE @codeRetour int;
+
+
+begin try
+	if @idlot is null 
+	begin
+		set @codeRetour = 1;
+		set @message = 'Le paramètre "idlot" ne doit pas être nul';
+	end 
+	else
+	begin
+	--vérifier l'existence du lot
+		if not EXISTS (select* from LOT where Id_lot = @idlot and Code_Etat = 1)
+			begin
+				--lot inexistant ou non lancé
+				Set @codeRetour = 2;
+				Set @message ='Le lot '+ CONVERT (varchar (10), @idlot) + ' est inexistant ou son état n''est pas à lancé';
+			end
+		else
+			begin
+			begin transaction
+			--On efface le contenu de cumul relatif au lot
+				DELETE FROM CUMUL
+				where CUMUL.Id_lot = @idlot
+
+			--On efface le lot
+				DELETE FROM LOT
+				where Id_lot = @idlot
+
+
+			set @codeRetour=0; --OK
+			Set @message='Annulation du lot ' + CONVERT (varchar (10), @idlot);
+			commit transaction;
+			end
+	end
+	end try
+	begin catch
+		--KO erreur base de données
+		Set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @codeRetour=3;
+		rollback transaction;
+	end catch
+RETURN (@codeRetour);
+go
+
 
 
 --Procedure Demarrer Production
@@ -212,7 +263,7 @@ AS
 DECLARE @codeRetour int;
 
 begin try
-	if @idlot is null
+	if @idlot is null 
 	begin
 		set @codeRetour = 1;
 		set @message = 'Le paramètre "idlot" ne doit pas être nul';
@@ -285,6 +336,7 @@ CREATE PROCEDURE Categorisation		@idlot		TypePieceLot,
 									@diamHT			TypeDiametre,
 									@diamBL			TypeDiametre,
 									@diamBT			TypeDiametre,
+									@commentaire	varchar(100),
 									@message	varchar(100) OUTPUT
 --categ existe - lot existe - diam non null - categ non null non rebut		
 AS
@@ -304,6 +356,11 @@ begin try
 	end
 
 	else if @diamBL is null or @diamBT is null or @diamHL is null or @diamHT is null
+	begin
+		set @codePlanning = 1;
+		set @message = 'Diametre non renseigné';
+	end
+		else if @diamBL <-1 or @diamBT <-1 or @diamHL <-1 or @diamHT <-1
 	begin
 		set @codePlanning = 1;
 		set @message = 'Diametre non renseigné';
@@ -329,10 +386,10 @@ begin try
 		--Recuperation du diametre
 		--Lancement de la fonction categorisation
 			SELECT @diamModele = Diametre FROM MODELE JOIN LOT ON MODELE.Modele = LOT.Modele WHERE Id_Lot = @idlot; 
-			SELECT @categPiece = dbo.fn_CategoriserPiece(@diamModele, @diamHL , @diamHT , @diamBL , @diamBT )--diambase, HL,HT,BL,BT
+			SELECT @categPiece = dbo.fn_CategoriserPiece(@diamModele, @diamHL , @diamHT , @diamBL , @diamBT)--diambase, HL,HT,BL,BT
 		--Insertion de la piece dans la table
 			INSERT PIECE 
-			VALUES (@diamHL , @diamHT , @diamBL , @diamBT, @categPiece, @idlot)
+			VALUES (@diamHL , @diamHT , @diamBL , @diamBT, @categPiece, @idlot, @commentaire)
 			Set @codePlanning = 0
 			Set @message = 'Pièce enregistrée dans le lot ' + CONVERT (varchar (10), @idlot) + ' : ' + CONVERT (varchar (10), @categPiece);
 			commit transaction;
@@ -934,6 +991,66 @@ return @coderetour
 go
 
 
+--Procédure modifier les seuils
+CREATE PROCEDURE modifierSeuils		@modele TypeModele,
+									@categorie TypeCategorie,
+									@seuil	int,	
+									@message varchar(200) output	
+as
+declare @code_retour int;
+	begin try
+			--Verification si le seuil n'est pas négatif
+		if @seuil is null or @seuil <=0
+			begin
+				set @message = 'Seuil invalide';
+				set @code_retour = 1;
+			end
+		--Verification si le modèle n'est pas null
+		else if @modele is null
+			begin
+				set @message = 'Modèle invalide';
+				set @code_retour = 1;
+			end
+		--Verification si la categorie n'est pas null
+		else if @categorie is null
+			begin
+				set @message = 'Catégorie invalide';
+				set @code_retour = 1;
+			end
+		--Verification si le modèle existe
+		else if not exists (select Modele from MODELE where Modele = @modele )
+			begin
+				set @message = 'Le modèle ' + CONVERT (varchar(10),@modele) + ' n'' existe pas';
+				set @code_retour = 2;
+			end
+		--Verification si la catégorie existe
+		else if not exists (select Categorie from CATEGORIE where Categorie = @categorie )
+			begin
+				set @message = 'La categorie ' + CONVERT (varchar(10),@categorie) + ' n'' existe pas';
+				set @code_retour = 2;
+			end
+		--Mise à jour du seuil mini
+		else
+			begin
+			begin transaction
+				update STOCK
+				set Seuil_Mini = @seuil
+				where Modele = @modele
+				and Categorie = @categorie;
+
+				set @message = 'Le seuil à été modifié pour le modèle '+ CONVERT (varchar(10),@modele) +' - ' +CONVERT (varchar(10),@categorie) + '. Nouveau seuil : ' + CONVERT (varchar(10),@seuil);
+				set @code_retour = 0
+			commit transaction;	
+			end
+	end try
+	begin catch
+		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @code_retour=3;
+		rollback transaction;
+	end catch
+return @code_retour
+go
+
 
 /*------------------------------------------------------------
 -- Creation des Vues
@@ -967,6 +1084,46 @@ AS SELECT LOT.Id_Lot, ETAT_LOT.Nom_Etat, MACHINE.Num_Presse, LOT.Code_Etat
 from LOT 
 join ETAT_LOT on LOT.Code_Etat = ETAT_LOT.Code_Etat
 LEFT JOIN MACHINE on LOT.Num_Presse = MACHINE.Num_Presse
+GO
+
+--Vue des lots lancés
+CREATE view VueLotsLances (LotsLancés, Modele, QuantitéDemandée)
+as
+select Id_Lot, Modele, Nb_Pieces_Demandees
+from LOT
+where Code_Etat = 1
+GO
+
+--Vue des lots demarrer
+CREATE View VueLotsDemarres (LotsDémarrés, Modèle, QuantitéDemandée, Presse)
+as
+select Id_Lot, Modele, Nb_Pieces_demandees, LOT.Num_Presse
+from LOT
+where LOT.Code_Etat = 2
+GO
+
+--Vue des des presses dispos
+CREATE VIEW VueEtatPresseDispo (NumPresse, EtatPresse)
+AS SELECT Num_Presse, Etat_Presse
+from MACHINE
+where Etat_Presse = 0
+GO
+
+--Vue des lots
+CREATE view VueLots
+as
+select Id_Lot, Modele, Nom_Etat
+from LOT
+join ETAT_LOT on LOT.Code_Etat = ETAT_LOT.Code_Etat
+GO
+
+--Vue pour le resp production
+CREATE view VueRespProd (Lot, EtatLot, NumPresse)
+as
+select Id_Lot, Nom_Etat, MACHINE.Num_Presse
+from LOT, ETAT_LOT, MACHINE
+where LOT.Code_Etat = ETAT_LOT.Code_Etat
+and LOT.Num_Presse = MACHINE.Num_Presse
 GO
 
 /*------------------------------------------------------------

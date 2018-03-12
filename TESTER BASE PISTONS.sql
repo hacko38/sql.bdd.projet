@@ -23,7 +23,7 @@ GO
 --Recupère les mesures d'une pièce et lui affecte une categorie
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = Categorisation 1,8.02 , 7.92 , 8.05 , 8,@msgRet OUTPUT --idlot, HL,HT,BL,BT
+EXEC @ret = Categorisation 1,8.02 , 7.92 , 8.05 , 8,@msgRet OUTPUT --idlot, HL,HT,BL,BT, comm
 PRINT @msgRet
 PRINT @ret
 GO
@@ -121,6 +121,14 @@ EXEC @ret = ps_LotsSelect 'R4', @msgret OUTPUT
 PRINT @msgret
 PRINT @ret
 go
+
+--Procedure ModifierSeuil
+Declare @msgRet varchar(100)
+Declare @ret int
+exec @ret = ModifierSeuils 'R4', 'PETIT', 180,  @msgRet OUTPUT 
+Print @msgRet
+Print @ret
+Go
 
 
 ----VUES----
