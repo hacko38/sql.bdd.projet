@@ -65,6 +65,8 @@ grant EXECUTE on Ajouter_modele to RESP_APPLI;
 grant EXECUTE on Supprimer_modele to RESP_APPLI;
 grant EXECUTE on Ajouter_machine to RESP_APPLI;
 grant EXECUTE on Supprimer_machine to RESP_APPLI;
+grant EXECUTE on modifierSeuils to RESP_APPLI;
+grant SELECT on VueStocksCategorie to RESP_APPLI;
 grant EXECUTE on ps_GetRole to public;
 /*grant EXECUTE on changeLimit to RESP_APPLI;
 grant EXECUTE on pieceCleanUp to RESP_APPLI;*/

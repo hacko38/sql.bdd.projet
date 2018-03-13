@@ -27,6 +27,7 @@ DROP PROCEDURE Rehabiliter_Modele
 DROP PROCEDURE ps_GetRole
 DROP PROCEDURE ps_LotsSelect
 DROP PROCEDURE AnnulerLot
+DROP PROCEDURE modifierSeuils
 go
 
 DROP VIEW VueStocksCategorie

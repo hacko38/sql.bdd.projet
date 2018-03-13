@@ -39,7 +39,7 @@ GO
 --Procedure Stockée ArretLot
 DECLARE @msgRet varchar(100)
 DECLARE @ret int
-EXEC @ret = ArretLot 1,@msgRet OUTPUT --IdLot, NumPresse
+EXEC @ret = ArretLot 2,@msgRet OUTPUT --IdLot, NumPresse
 PRINT @msgRet
 PRINT @ret
 GO
@@ -71,7 +71,7 @@ GO
 --Procedure Stockée SupprimerMachine
 Declare @msgRet varchar(100)
 Declare @ret int
-exec @ret = Supprimer_Machine 1004, @msgRet OUTPUT 
+exec @ret = Supprimer_Machine 1001, @msgRet OUTPUT 
 Print @msgRet
 Print @ret
 Go
