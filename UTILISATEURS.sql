@@ -24,8 +24,8 @@ CREATE LOGIN controleur3 WITH PASSWORD ='controleur3';
 CREATE LOGIN magasinier1 WITH PASSWORD ='magasinier1';
 CREATE LOGIN magasinier2 WITH PASSWORD ='magasinier2';
 CREATE LOGIN magasinier3 WITH PASSWORD ='magasinier3';
-CREATE LOGIN resp_qualité1 WITH PASSWORD ='resp_qualité1';
-CREATE LOGIN resp_qualité2 WITH PASSWORD ='resp_qualité2';
+CREATE LOGIN resp_qualitÃ©1 WITH PASSWORD ='resp_qualitÃ©1';
+CREATE LOGIN resp_qualitÃ©2 WITH PASSWORD ='resp_qualitÃ©2';
 go
 */
 
@@ -43,14 +43,15 @@ CREATE USER ucontroleur3 FROM login controleur3;
 CREATE USER umagasinier1 FROM login magasinier1;
 CREATE USER umagasinier2 FROM login magasinier2;
 CREATE USER umagasinier3 FROM login magasinier3;
-CREATE USER uresp_qualité1 FROM login resp_qualité1;
-CREATE USER uresp_qualité2 FROM login resp_qualité2;
+CREATE USER uresp_qualitÃ©1 FROM login resp_qualitÃ©1;
+CREATE USER uresp_qualitÃ©2 FROM login resp_qualitÃ©2;
 go
 
 
--- AFFECTATIONS DES DROITS AUX RÔLES
+-- AFFECTATIONS DES DROITS AUX RÃ”LES
 grant SELECT on VueStocksCategorie to RESP_ATELIER;
 grant SELECT on VueTousLots to RESP_ATELIER;
+grant SELECT on vueStatistiques to RESP_QUALITE;
 grant EXECUTE on LancerLot to RESP_ATELIER;
 grant EXECUTE on AnnulerLot to RESP_ATELIER;
 grant EXECUTE on ps_LotsSelect to RESP_ATELIER;
@@ -83,8 +84,8 @@ alter role CONTROLEUR add member ucontroleur3;
 alter role MAGASINIER add member umagasinier1;
 alter role MAGASINIER add member umagasinier2;
 alter role MAGASINIER add member umagasinier3;
-alter role RESP_QUALITE add member uresp_qualité1;
-alter role RESP_QUALITE add member uresp_qualité2;
+alter role RESP_QUALITE add member uresp_qualitÃ©1;
+alter role RESP_QUALITE add member uresp_qualitÃ©2;
 
 
 go
