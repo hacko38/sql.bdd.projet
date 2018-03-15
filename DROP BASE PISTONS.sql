@@ -40,6 +40,7 @@ DROP VIEW VueLotsDemarres
 DROP VIEW VueRespProd
 DROP VIEW VueLots
 DROP VIEW VueEtatPresseDispo
+DROP VIEW vueStatistiques
 go
 
 DROP USER uresp_appli 
@@ -53,8 +54,8 @@ DROP USER ucontroleur3
 DROP USER umagasinier1 
 DROP USER umagasinier2 
 DROP USER umagasinier3 
-DROP USER uresp_qualité1
-DROP USER uresp_qualité2
+DROP USER uresp_qualitÃ©1
+DROP USER uresp_qualitÃ©2
 go
 
 /*
@@ -69,8 +70,8 @@ DROP LOGIN controleur3
 DROP LOGIN magasinier1
 DROP LOGIN magasinier2
 DROP LOGIN magasinier3
-DROP LOGIN resp_qualité1
-DROP LOGIN resp_qualité2
+DROP LOGIN resp_qualitÃ©1
+DROP LOGIN resp_qualitÃ©2
 go
 */
 
