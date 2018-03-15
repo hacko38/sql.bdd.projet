@@ -30,7 +30,7 @@ go
 CREATE TABLE MODELE(
 	Modele   TypeModele PRIMARY KEY,
 	Diametre TypeDiametre,
-	Supprimée bit   
+	SupprimÃ©e bit   
 );
 
 /*------------------------------------------------------------
@@ -39,7 +39,7 @@ CREATE TABLE MODELE(
 CREATE TABLE MACHINE(
 	Num_Presse  smallint  NOT NULL	PRIMARY KEY		CHECK (Num_Presse LIKE '[0-9][0-9][0-9][0-9]'),
 	Etat_Presse bit,
-	Supprimée bit   
+	SupprimÃ©e bit   
 );
 
 
@@ -146,8 +146,8 @@ JOIN sys.server_principals AS member
 /*------------------------------------------------------------
 -- Creation des PROCEDURES
 ------------------------------------------------------------*/
---Procedure de creation du lot à l'état lancé
-CREATE PROCEDURE LancerLot		@nbPièces	Int,
+--Procedure de creation du lot Ã  l'Ã©tat lancÃ©
+CREATE PROCEDURE LancerLot		@nbPiÃ¨ces	Int,
 								@modele		TypeModele,
 								@message	varchar(100) OUTPUT
 
@@ -156,19 +156,19 @@ DECLARE @codeRetour int;
 
 
 begin try
-	if @nbPièces is null or @nbPièces <= 0
+	if @nbPiÃ¨ces is null or @nbPiÃ¨ces <= 0
 	begin
 		set @codeRetour = 1;
-		set @message = 'Nb de pièces incohérent';
+		set @message = 'Nb de piÃ¨ces incohÃ©rent';
 	end
 	else if @modele is Null
 	begin
 		set @codeRetour = 1;
-		set @message = 'Modèle non défini';
+		set @message = 'ModÃ¨le non dÃ©fini';
 	end
 	else
 	begin
-	--vérifier l'existence du modele
+	--vÃ©rifier l'existence du modele
 		if not EXISTS (select * from MODELE
 		where Modele = @modele)
 			begin
@@ -180,7 +180,7 @@ begin try
 			begin
 			begin transaction
 				INSERT INTO LOT (Nb_Pieces_demandees,Modele,Code_Etat)
-				VALUES (@nbPièces,@modele,'1')
+				VALUES (@nbPiÃ¨ces,@modele,'1')
 
 				--Maj du commentaire Stock
 				UPDATE dbo.STOCK
@@ -188,21 +188,21 @@ begin try
 				where STOCK.Modele = @modele;
 
 			set @codeRetour=0; --OK
-			Set @message='Demande de lancement de production pour ' + CONVERT (varchar (10), @nbPièces) + ' pièces ' + CONVERT (varchar (10), @modele);
+			Set @message='Demande de lancement de production pour ' + CONVERT (varchar (10), @nbPiÃ¨ces) + ' piÃ¨ces ' + CONVERT (varchar (10), @modele);
 			commit transaction;
 			end
 	end
 	end try
 	begin catch
-		--KO erreur base de données
-		Set @message='erreur base de données' + ERROR_MESSAGE() ;
+		--KO erreur base de donnÃ©es
+		Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
 		rollback transaction;
 	end catch
 RETURN (@codeRetour);
 go
 
---Procedure d'annulation du lot lancé
+--Procedure d'annulation du lot lancÃ©
 CREATE PROCEDURE AnnulerLot		@idlot		TypePieceLot,
 								@message	varchar(100) OUTPUT
 
@@ -214,16 +214,16 @@ begin try
 	if @idlot is null 
 	begin
 		set @codeRetour = 1;
-		set @message = 'Le paramètre "idlot" ne doit pas être nul';
+		set @message = 'Le paramÃ¨tre "idlot" ne doit pas Ãªtre nul';
 	end 
 	else
 	begin
-	--vérifier l'existence du lot
+	--vÃ©rifier l'existence du lot
 		if not EXISTS (select* from LOT where Id_lot = @idlot and Code_Etat = 1)
 			begin
-				--lot inexistant ou non lancé
+				--lot inexistant ou non lancÃ©
 				Set @codeRetour = 2;
-				Set @message ='Le lot '+ CONVERT (varchar (10), @idlot) + ' est inexistant ou son état n''est pas à lancé';
+				Set @message ='Le lot '+ CONVERT (varchar (10), @idlot) + ' est inexistant ou son Ã©tat n''est pas Ã  lancÃ©';
 			end
 		else
 			begin
@@ -244,8 +244,8 @@ begin try
 	end
 	end try
 	begin catch
-		--KO erreur base de données
-		Set @message='erreur base de données' + ERROR_MESSAGE() ;
+		--KO erreur base de donnÃ©es
+		Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
 		rollback transaction;
 	end catch
@@ -266,17 +266,17 @@ begin try
 	if @idlot is null 
 	begin
 		set @codeRetour = 1;
-		set @message = 'Le paramètre "idlot" ne doit pas être nul';
+		set @message = 'Le paramÃ¨tre "idlot" ne doit pas Ãªtre nul';
 	end 
 	else if @numpresse is null
 	begin
 		set @codeRetour = 1;
-		set @message = 'Le paramètre "numpresse" ne doit pas être nul';
+		set @message = 'Le paramÃ¨tre "numpresse" ne doit pas Ãªtre nul';
 	end
 	else if (SELECT LOT.Code_Etat from LOT where Id_lot = @idlot) <> 1
 	begin
 		set @codeRetour = 1;
-		set @message = 'Le lot ' + CONVERT (varchar (10), @idlot) + ' n''est pas à l''état lancé';
+		set @message = 'Le lot ' + CONVERT (varchar (10), @idlot) + ' n''est pas Ã  l''Ã©tat lancÃ©';
 	end
 	else if (SELECT MACHINE.Etat_Presse from MACHINE where Num_Presse = @numpresse) <>0
 	begin
@@ -285,14 +285,14 @@ begin try
 	end
 	else 
 	begin
-	--vérifier l'existence du lot
+	--vÃ©rifier l'existence du lot
 		if not EXISTS (select* from LOT where Id_lot = @idlot)
 			begin
 				--lot inexistant
 				Set @codeRetour = 2;
 				Set @message ='Le lot '+ CONVERT (varchar (10), @idlot) + ' est inexistant';
 			end
-	--vérifier l'existence de la presse
+	--vÃ©rifier l'existence de la presse
 		else if not exists (select * from MACHINE where Num_Presse = @numpresse)
 			begin
 				--Presse inexistante
@@ -302,27 +302,27 @@ begin try
 		else
 		begin
 		begin transaction
-		--Affectation presse et changement état_lot
+		--Affectation presse et changement Ã©tat_lot
 			UPDATE dbo.LOT			
 			Set Code_Etat = 2, LOT.Num_Presse = @numpresse
 			Where Id_lot = @idlot
-			--Affectation presse et changement état_lot
+			--Affectation presse et changement Ã©tat_lot
 			UPDATE dbo.LOT			
 			Set Date_Fabrication = GETDATE ( )
 			Where Id_lot = @idlot
-		--Changement état_presse--
+		--Changement Ã©tat_presse--
 			UPDATE dbo.MACHINE
 			Set Etat_Presse = 1
 			Where Num_Presse = @numpresse;
 			Set @codeRetour = 0
-			Set @message = 'La production pour le lot ' + CONVERT (varchar (10), @idlot) + ' est demarrée sur la presse ' + CONVERT (varchar (10), @numpresse);
+			Set @message = 'La production pour le lot ' + CONVERT (varchar (10), @idlot) + ' est demarrÃ©e sur la presse ' + CONVERT (varchar (10), @numpresse);
 			commit transaction;
 		end
 	end
 end try
 begin catch
-	--KO erreur base de données--
-	Set @message='erreur base de données' + ERROR_MESSAGE() ;
+	--KO erreur base de donnÃ©es--
+	Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 	set @codeRetour=4;
 	rollback transaction;
 end catch
@@ -347,27 +347,27 @@ begin try
 	if @idlot is null
 	begin
 		set @codePlanning = 1;
-		set @message = 'Le paramètre "idlot" ne doit  pas être nul';
+		set @message = 'Le paramÃ¨tre "idlot" ne doit  pas Ãªtre nul';
 	end
 	else if (SELECT LOT.Code_Etat from LOT where Id_Lot = @idlot) <> 2 and (SELECT LOT.Code_Etat from LOT where Id_Lot = @idlot) <> 3
 	begin
 		set @codePlanning = 1;
-		set @message = 'Le lot doit être à l''état demarré ou libéré';
+		set @message = 'Le lot doit Ãªtre Ã  l''Ã©tat demarrÃ© ou libÃ©rÃ©';
 	end
 
 	else if @diamBL is null or @diamBT is null or @diamHL is null or @diamHT is null
 	begin
 		set @codePlanning = 1;
-		set @message = 'Diametre non renseigné';
+		set @message = 'Diametre non renseignÃ©';
 	end
 		else if @diamBL <-1 or @diamBT <-1 or @diamHL <-1 or @diamHT <-1
 	begin
 		set @codePlanning = 1;
-		set @message = 'Diametre non renseigné';
+		set @message = 'Diametre non renseignÃ©';
 	end
 	else 
 	begin
-	--vérifier l'existence du lot--
+	--vÃ©rifier l'existence du lot--
 		if not EXISTS (select* from LOT where Id_lot = @idlot)
 			begin
 				--lot inexistant--
@@ -378,7 +378,7 @@ begin try
 			begin
 				--lot inexistant--
 				Set @codePlanning = 2;
-				Set @message ='Nombre de pièces max atteint';
+				Set @message ='Nombre de piÃ¨ces max atteint';
 			end
 		else
 		begin
@@ -391,14 +391,14 @@ begin try
 			INSERT PIECE 
 			VALUES (@diamHL , @diamHT , @diamBL , @diamBT, @categPiece, @idlot, @commentaire)
 			Set @codePlanning = 0
-			Set @message = 'Pièce enregistrée dans le lot ' + CONVERT (varchar (10), @idlot) + ' : ' + CONVERT (varchar (10), @categPiece);
+			Set @message = 'PiÃ¨ce enregistrÃ©e dans le lot ' + CONVERT (varchar (10), @idlot) + ' : ' + CONVERT (varchar (10), @categPiece);
 			commit transaction;
 		end
 	end
 end try
 begin catch
-	--KO erreur base de données--
-	Set @message='erreur base de données' + ERROR_MESSAGE() ;
+	--KO erreur base de donnÃ©es--
+	Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 	set @codePlanning=4;
 	rollback transaction;
 end catch
@@ -407,7 +407,7 @@ go
 
 
 
---Procedure pour passer la presse en statut "Libérée"
+--Procedure pour passer la presse en statut "LibÃ©rÃ©e"
 CREATE procedure Liberer_presse		@idlot TypePieceLot,
 									@message varchar(100) output
 
@@ -415,31 +415,31 @@ as
 declare @code_retour int;
 	begin try
 		
-		--Verification si le numéro de presse n'est pas null
+		--Verification si le numÃ©ro de presse n'est pas null
 		if @idlot is null
 			begin
-				set @message = 'Numéro de lot invalide';
+				set @message = 'NumÃ©ro de lot invalide';
 				set @code_retour = 1;
 			end
-		--Verification si le numéro de lot existe
+		--Verification si le numÃ©ro de lot existe
 		else if not exists (select Id_Lot from LOT where Id_Lot = @idlot)
 			begin
 				set @message = 'Le lot ' + CONVERT (varchar(10),@idlot) + ' n''existe pas';
 				set @code_retour = 2;
 			end
 
-		--Verification si la presse n'est pas déjà en état "Libérée"
+		--Verification si la presse n'est pas dÃ©jÃ  en Ã©tat "LibÃ©rÃ©e"
 		else if  (select Etat_Presse from MACHINE 
 					JOIN LOT on MACHINE.Num_Presse = LOT.Num_Presse 
 					where Id_Lot = @idlot) = 0   
 			begin
-				set  @message = 'La presse est déjà en état "Libérée"';
+				set  @message = 'La presse est dÃ©jÃ  en Ã©tat "LibÃ©rÃ©e"';
 				set @code_retour = 2;		
 			end
 		else
 		begin
 		begin transaction	
-				--Passage de la presse en état "Libérée"
+				--Passage de la presse en Ã©tat "LibÃ©rÃ©e"
 				UPDATE MACHINE
 				set Etat_Presse = 0
 				from MACHINE
@@ -450,13 +450,13 @@ declare @code_retour int;
 				set Code_Etat = 3
 				where Id_Lot = @idlot;
 
-				set @message = 'La presse a été basculé en état "Libérée"' ;
+				set @message = 'La presse a Ã©tÃ© basculÃ© en Ã©tat "LibÃ©rÃ©e"' ;
 				set @code_retour = 0;
 		commit transaction;	
 		end
 	end try	
 	begin catch
-		Set @message='erreur base de données' + ERROR_MESSAGE() ;
+		Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -475,16 +475,16 @@ begin try
 	if @idlot is null
 	begin
 		set @codeRetour = 1;
-		set @message = 'Le paramètre "idlot" ne doit pas être nul';
+		set @message = 'Le paramÃ¨tre "idlot" ne doit pas Ãªtre nul';
 	end
 	else if (SELECT LOT.Code_Etat from LOT where Id_lot = @idlot) <> 3
 	begin
 		set @codeRetour = 1;
-		set @message = 'Le lot ' + CONVERT (varchar (10), @idlot) + ' n''est pas à l''état libéré';
+		set @message = 'Le lot ' + CONVERT (varchar (10), @idlot) + ' n''est pas Ã  l''Ã©tat libÃ©rÃ©';
 	end
 	else 
 	begin
-	--vérifier l'existence du lot
+	--vÃ©rifier l'existence du lot
 		if not EXISTS (select* from LOT where Id_lot = @idlot)
 			begin
 				--lot inexistant
@@ -494,7 +494,7 @@ begin try
 		else
 		begin
 		begin transaction
-		--Mise à jour des moyennes, max, min et écart types
+		--Mise Ã  jour des moyennes, max, min et Ã©cart types
 			UPDATE dbo.LOT			
 			Set Moyenne_HL = convert(decimal(10, 5),(SELECT AVG (Diametre_HL)from PIECE where PIECE.Id_Lot=@idlot)), 
 			Moyenne_HT = convert(decimal(10, 5),(SELECT AVG (Diametre_HT)from PIECE where PIECE.Id_Lot=@idlot)),
@@ -514,21 +514,21 @@ begin try
 			Ecart_Type_BT = convert(decimal(10, 5),(SELECT STDEV (Diametre_BT)from PIECE where PIECE.Id_Lot=@idlot))
 
 			Where Id_lot = @idlot
-			--Mise à jour de l'état lot
+			--Mise Ã  jour de l'Ã©tat lot
 			UPDATE LOT
 			set Code_Etat = 4
 			where Id_Lot = @idlot;
 			--renvoi code retour
 			Set @codeRetour = 0;
-			Set @message ='Le lot ' + CONVERT (varchar (10), @idlot) + ' est passé en état "Arrêté". Statistiques mises à jour';
+			Set @message ='Le lot ' + CONVERT (varchar (10), @idlot) + ' est passÃ© en Ã©tat "ArrÃªtÃ©". Statistiques mises Ã  jour';
 
 			commit transaction;
 		end
 	end
 end try
 begin catch
-	--KO erreur base de données--
-	Set @message='erreur base de données' + ERROR_MESSAGE() ;
+	--KO erreur base de donnÃ©es--
+	Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 	set @codeRetour=4;
 	rollback transaction;
 end catch
@@ -536,8 +536,8 @@ RETURN (@codeRetour);
 go
 
 
---Procedure de sortie de pièces
-CREATE PROCEDURE SortieStock	@nbPiècesSorties	Int,
+--Procedure de sortie de piÃ¨ces
+CREATE PROCEDURE SortieStock	@nbPiÃ¨cesSorties	Int,
 								@categorie			TypeCategorie,
 								@modele				TypeModele,
 								@message			varchar(100) OUTPUT
@@ -547,10 +547,10 @@ DECLARE @codeRetour int;
 
 
 begin try
-	if @nbPiècesSorties is null or @nbPiècesSorties <= 0
+	if @nbPiÃ¨cesSorties is null or @nbPiÃ¨cesSorties <= 0
 	begin
 		set @codeRetour = 1;
-		set @message = 'Nb de pièces incohérent';
+		set @message = 'Nb de piÃ¨ces incohÃ©rent';
 	end
 	else if @categorie is Null
 	begin
@@ -560,11 +560,11 @@ begin try
 	else if @modele is Null
 	begin
 		set @codeRetour = 1;
-		set @message = 'Modèle non défini';
+		set @message = 'ModÃ¨le non dÃ©fini';
 	end
 	else
 	begin
-	--vérifier l'existence du modele
+	--vÃ©rifier l'existence du modele
 		if not EXISTS (select * from MODELE
 		where Modele = @modele)
 			begin
@@ -580,28 +580,28 @@ begin try
 				set @codeRetour=2;
 			end
 			--Verification si le retrait est possible
-		else if (SELECT Quantite_Stock FROM STOCK WHERE Modele = @modele AND Categorie = @categorie) - @nbPiècesSorties < 0
+		else if (SELECT Quantite_Stock FROM STOCK WHERE Modele = @modele AND Categorie = @categorie) - @nbPiÃ¨cesSorties < 0
 			begin
 				set @codeRetour = 2;
-				set @message = 'Opération impossible - Le stock est insuffisant';
+				set @message = 'OpÃ©ration impossible - Le stock est insuffisant';
 			end
 		else
 			begin
 			begin transaction
 				UPDATE STOCK
-				SET Quantite_Stock = Quantite_Stock-@nbPiècesSorties
+				SET Quantite_Stock = Quantite_Stock-@nbPiÃ¨cesSorties
 				WHERE Modele = @modele
 				AND Categorie = @categorie
 
 			set @codeRetour=0; --OK
-			set @message = 'Sortie de '+ CONVERT (varchar (10), @nbPiècesSorties) + ' pièces effectuée pour le modele ' + CONVERT (varchar (10), @modele) + ' catégorie ' + CONVERT (varchar (10), @categorie);
+			set @message = 'Sortie de '+ CONVERT (varchar (10), @nbPiÃ¨cesSorties) + ' piÃ¨ces effectuÃ©e pour le modele ' + CONVERT (varchar (10), @modele) + ' catÃ©gorie ' + CONVERT (varchar (10), @categorie);
 			commit transaction;
 			end
 	end
 	end try
 	begin catch
-		--KO erreur base de données
-		Set @message='erreur base de données' + ERROR_MESSAGE() ;
+		--KO erreur base de donnÃ©es
+		Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
 		rollback transaction;
 	end catch
@@ -609,8 +609,8 @@ RETURN (@codeRetour);
 go
 
 
---Procedure d'entrée pièces en stock
-CREATE PROCEDURE EntreeStock	@nbPiècesEntrées	Int,
+--Procedure d'entrÃ©e piÃ¨ces en stock
+CREATE PROCEDURE EntreeStock	@nbPiÃ¨cesEntrÃ©es	Int,
 								@categorie			TypeCategorie,
 								@modele				TypeModele,
 								@message			varchar(100) OUTPUT
@@ -620,10 +620,10 @@ DECLARE @codeRetour int;
 
 
 begin try
-	if @nbPiècesEntrées is null or @nbPiècesEntrées <= 0
+	if @nbPiÃ¨cesEntrÃ©es is null or @nbPiÃ¨cesEntrÃ©es <= 0
 	begin
 		set @codeRetour = 1;
-		set @message = 'Nb de pièces incohérent';
+		set @message = 'Nb de piÃ¨ces incohÃ©rent';
 	end
 	else if @categorie is Null
 	begin
@@ -633,11 +633,11 @@ begin try
 	else if @modele is Null
 	begin
 		set @codeRetour = 1;
-		set @message = 'Modèle non défini';
+		set @message = 'ModÃ¨le non dÃ©fini';
 	end
 	else
 	begin
-	--vérifier l'existence du modele
+	--vÃ©rifier l'existence du modele
 		if not EXISTS (select * from MODELE
 		where Modele = @modele)
 			begin
@@ -656,26 +656,26 @@ begin try
 			begin
 			begin transaction
 				UPDATE STOCK
-				SET Quantite_Stock = Quantite_Stock+@nbPiècesEntrées
+				SET Quantite_Stock = Quantite_Stock+@nbPiÃ¨cesEntrÃ©es
 				WHERE Modele = @modele
 				AND Categorie = @categorie
 
 			set @codeRetour=0; --OK
-			set @message = 'Entrée de '+ CONVERT (varchar (10), @nbPiècesEntrées) + ' pièces effectuée pour le modele ' + CONVERT (varchar (10), @modele) + ' catégorie ' + CONVERT (varchar (10), @categorie);
+			set @message = 'EntrÃ©e de '+ CONVERT (varchar (10), @nbPiÃ¨cesEntrÃ©es) + ' piÃ¨ces effectuÃ©e pour le modele ' + CONVERT (varchar (10), @modele) + ' catÃ©gorie ' + CONVERT (varchar (10), @categorie);
 			commit transaction;
 			end
 	end
 	end try
 	begin catch
-		--KO erreur base de données
-		Set @message='erreur base de données' + ERROR_MESSAGE() ;
+		--KO erreur base de donnÃ©es
+		Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @codeRetour=3;
 		rollback transaction;
 	end catch
 RETURN (@codeRetour);
 go
 
------Procédure de création de catégories dans cumul
+-----ProcÃ©dure de crÃ©ation de catÃ©gories dans cumul
 CREATE PROCEDURE CreerCumul			@idlot	TypePieceLot,
 									@message	varchar(50) OUTPUT
 									
@@ -686,11 +686,11 @@ begin try
 	if @idlot is null
 	begin
 		set @codePlanning = 1;
-		set @message = 'Le paramètre "idlot" ne doit pas être nul';
+		set @message = 'Le paramÃ¨tre "idlot" ne doit pas Ãªtre nul';
 	end
 	else
 	begin
-	--vérifier l'existence du lot--
+	--vÃ©rifier l'existence du lot--
 		if not EXISTS (select* from LOT where Id_lot = @idlot)
 			begin
 				--lot inexistant--
@@ -706,14 +706,14 @@ begin try
 		from LOT, CATEGORIE
 		WHERE Id_Lot = @idlot;
 		Set @codePlanning = 0
-		Set @message = 'Insertion effectuée'
+		Set @message = 'Insertion effectuÃ©e'
 		commit transaction;
 	end
 end
 end try
 begin catch
-	--KO erreur base de données--
-	Set @message='erreur base de données' + ERROR_MESSAGE() ;
+	--KO erreur base de donnÃ©es--
+	Set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 	set @codePlanning=4;
 	rollback transaction;
 end catch
@@ -726,30 +726,30 @@ CREATE PROCEDURE Ajouter_machine @Num_Presse smallint,
 as
 declare @code_retour int;
 	begin try
-		--Verification si le numéro de presse n'est pas null
+		--Verification si le numÃ©ro de presse n'est pas null
 		if @Num_Presse is null
 			begin
-				set @message = 'Numéro de presse invalide';
+				set @message = 'NumÃ©ro de presse invalide';
 				set @code_retour = 1;
 			end
-		--Verification si la presse existe déjà
+		--Verification si la presse existe dÃ©jÃ 
 		else if exists (select Num_Presse from MACHINE where Num_Presse = @Num_Presse )
 			begin
-				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' existe déjà';
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' existe dÃ©jÃ ';
 				set @code_retour = 2;
 			end
-		--Ajout de la presse avec un état à 0
+		--Ajout de la presse avec un Ã©tat Ã  0
 		else
 			begin
 				begin transaction
 				insert MACHINE values (@Num_Presse , '0','0');
-				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été ajoutée';
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a Ã©tÃ© ajoutÃ©e';
 				set @code_retour = 0;
 				commit transaction;
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -762,10 +762,10 @@ CREATE PROCEDURE Supprimer_machine		@Num_Presse smallint,
 as
 declare @code_retour int;
 	begin try
-		--Verification si le numéro de presse n'est pas null
+		--Verification si le numÃ©ro de presse n'est pas null
 		if @Num_Presse is null
 			begin
-				set @message = 'Numéro de presse invalide';
+				set @message = 'NumÃ©ro de presse invalide';
 				set @code_retour = 1;
 			end
 		--Verification si la presse existe
@@ -774,21 +774,21 @@ declare @code_retour int;
 				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
-		--Suppression de la presse avec valeur à 1 pour "Supprimer"
+		--Suppression de la presse avec valeur Ã  1 pour "Supprimer"
 		else
 			begin
 				begin transaction
 				update MACHINE
-				set Supprimée = 1
+				set SupprimÃ©e = 1
 				where Num_Presse = @Num_Presse;
-				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été supprimée'
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a Ã©tÃ© supprimÃ©e'
 				set @code_retour = 0
 				commit transaction;
 				
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -796,16 +796,16 @@ return @code_retour
 go
 
 
---Procédure Réhabiliter_Machine
+--ProcÃ©dure RÃ©habiliter_Machine
 CREATE PROCEDURE Rehabiliter_machine	@Num_Presse smallint,
 										@message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
-		--Verification si le numéro de presse n'est pas null
+		--Verification si le numÃ©ro de presse n'est pas null
 		if @Num_Presse is null
 			begin
-				set @message = 'Numéro de presse invalide';
+				set @message = 'NumÃ©ro de presse invalide';
 				set @code_retour = 1;
 			end
 		--Verification si la presse existe
@@ -814,21 +814,21 @@ declare @code_retour int;
 				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
-		--Suppression de la presse avec valeur à 1 pour "Supprimer"
+		--Suppression de la presse avec valeur Ã  1 pour "Supprimer"
 		else
 			begin
 				begin transaction
 				update MACHINE
-				set Supprimée = 0
+				set SupprimÃ©e = 0
 				where Num_Presse = @Num_Presse;
-				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a été réhabilitée'
+				set @message = 'La presse ' + CONVERT (varchar(10),@Num_Presse) + ' a Ã©tÃ© rÃ©habilitÃ©e'
 				set @code_retour = 0
 				commit transaction;
 				
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -836,38 +836,38 @@ return @code_retour
 go
 
 
---Procédure Supprimer_Modele
+--ProcÃ©dure Supprimer_Modele
 CREATE PROCEDURE Supprimer_modele	@m_Modele TypeModele,
 									@message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
-		--Verification si le modèle n'est pas null
+		--Verification si le modÃ¨le n'est pas null
 		if @m_Modele is null
 			begin
-				set @message = 'Modèle invalide';
+				set @message = 'ModÃ¨le invalide';
 				set @code_retour = 1;
 			end
-		--Verification si le modèle existe
+		--Verification si le modÃ¨le existe
 		else if not exists (select Modele from MODELE where Modele = @m_Modele )
 			begin
-				set @message = 'Le modèle ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
+				set @message = 'Le modÃ¨le ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
-		--Suppression du modèle avec valeur à 1 pour "Supprimer"
+		--Suppression du modÃ¨le avec valeur Ã  1 pour "Supprimer"
 		else
 			begin
 			begin transaction
 				update MODELE
-				set Supprimée = 1
+				set SupprimÃ©e = 1
 				where Modele = @m_Modele;
-				set @message = 'Le Modèle ' + CONVERT (varchar(10),@m_Modele) + ' a été supprimée'
+				set @message = 'Le ModÃ¨le ' + CONVERT (varchar(10),@m_Modele) + ' a Ã©tÃ© supprimÃ©e'
 				set @code_retour = 0
 			commit transaction;
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -875,38 +875,38 @@ return @code_retour
 go
 
 
---Procédure Réhabiliter_Modele
+--ProcÃ©dure RÃ©habiliter_Modele
 CREATE PROCEDURE Rehabiliter_Modele	 @m_Modele TypeModele,
 									 @message varchar(200) output	
 as
 declare @code_retour int;
 	begin try
-		--Verification si le modèle n'est pas null
+		--Verification si le modÃ¨le n'est pas null
 		if @m_Modele is null
 			begin
-				set @message = 'Modèle invalide';
+				set @message = 'ModÃ¨le invalide';
 				set @code_retour = 1;
 			end
-		--Verification si le modèle existe
+		--Verification si le modÃ¨le existe
 		else if not exists (select Modele from MODELE where Modele = @m_Modele )
 			begin
-				set @message = 'Le modèle ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
+				set @message = 'Le modÃ¨le ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
-		--Suppression du modèle avec valeur à 1 pour "Supprimer"
+		--Suppression du modÃ¨le avec valeur Ã  1 pour "Supprimer"
 		else
 			begin
 			begin transaction
 				update MODELE
-				set Supprimée = 0
+				set SupprimÃ©e = 0
 				where Modele = @m_Modele;
-				set @message = 'Le Modèle ' + CONVERT (varchar(10),@m_Modele) + ' a été réhabilité'
+				set @message = 'Le ModÃ¨le ' + CONVERT (varchar(10),@m_Modele) + ' a Ã©tÃ© rÃ©habilitÃ©'
 				set @code_retour = 0
 			commit transaction;	
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -920,30 +920,30 @@ CREATE PROCEDURE Ajouter_modele @Modele TypeModele,
 as
 declare @code_retour int;
 	begin try
-		--Verification si le modèle ou le diamètre n'est pas null
+		--Verification si le modÃ¨le ou le diamÃ¨tre n'est pas null
 		if @Modele is null or @Diametre is null
 			begin
-				set @message = 'Modèle et/ou diamètre incorrect';
+				set @message = 'ModÃ¨le et/ou diamÃ¨tre incorrect';
 				set @code_retour = 1;
 			end
-		--Verification si le modéle existe déjà
+		--Verification si le modÃ©le existe dÃ©jÃ 
 		else if exists (select Modele from MODELE where Modele = @Modele )
 			begin
-				set @message = 'Le modèle ' + CONVERT (varchar(10),@Modele) + ' existe déjà';
+				set @message = 'Le modÃ¨le ' + CONVERT (varchar(10),@Modele) + ' existe dÃ©jÃ ';
 				set @code_retour = 2;
 			end
-		--Ajout du modèle avec son diamètre
+		--Ajout du modÃ¨le avec son diamÃ¨tre
 		else
 			begin
 			begin transaction
 				insert MODELE values (@Modele , @Diametre, 0);
-				set @message = 'Le modèle ' + CONVERT (varchar(10),@Modele) + ' avec un diamètre de ' + CONVERT (varchar(10),@Diametre) + ' a été ajouté';
+				set @message = 'Le modÃ¨le ' + CONVERT (varchar(10),@Modele) + ' avec un diamÃ¨tre de ' + CONVERT (varchar(10),@Diametre) + ' a Ã©tÃ© ajoutÃ©';
 				set @code_retour = 0;
 			commit transaction;
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -964,11 +964,11 @@ begin try
 	if @modele is null
 	begin
 		set @coderetour = 1;
-		set @message = 'Le paramètre "modele" ne doit  pas être nul';
+		set @message = 'Le paramÃ¨tre "modele" ne doit  pas Ãªtre nul';
 	end
 	else 
 	begin
-	--vérifier l'existence du modele--
+	--vÃ©rifier l'existence du modele--
 		if not EXISTS (select* from LOT where Modele = @modele)
 			begin
 				--lot inexistant--
@@ -982,7 +982,7 @@ begin try
 	end
 end try
 begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @coderetour=3;
 end catch
 return @coderetour
@@ -991,7 +991,7 @@ return @coderetour
 go
 
 
---Procédure modifier les seuils
+--ProcÃ©dure modifier les seuils
 CREATE PROCEDURE modifierSeuils		@modele TypeModele,
 									@categorie TypeCategorie,
 									@seuil	int,	
@@ -999,37 +999,37 @@ CREATE PROCEDURE modifierSeuils		@modele TypeModele,
 as
 declare @code_retour int;
 	begin try
-			--Verification si le seuil n'est pas négatif
+			--Verification si le seuil n'est pas nÃ©gatif
 		if @seuil is null or @seuil <=0
 			begin
 				set @message = 'Seuil invalide';
 				set @code_retour = 1;
 			end
-		--Verification si le modèle n'est pas null
+		--Verification si le modÃ¨le n'est pas null
 		else if @modele is null
 			begin
-				set @message = 'Modèle invalide';
+				set @message = 'ModÃ¨le invalide';
 				set @code_retour = 1;
 			end
 		--Verification si la categorie n'est pas null
 		else if @categorie is null
 			begin
-				set @message = 'Catégorie invalide';
+				set @message = 'CatÃ©gorie invalide';
 				set @code_retour = 1;
 			end
-		--Verification si le modèle existe
+		--Verification si le modÃ¨le existe
 		else if not exists (select Modele from MODELE where Modele = @modele )
 			begin
-				set @message = 'Le modèle ' + CONVERT (varchar(10),@modele) + ' n'' existe pas';
+				set @message = 'Le modÃ¨le ' + CONVERT (varchar(10),@modele) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
-		--Verification si la catégorie existe
+		--Verification si la catÃ©gorie existe
 		else if not exists (select Categorie from CATEGORIE where Categorie = @categorie )
 			begin
 				set @message = 'La categorie ' + CONVERT (varchar(10),@categorie) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
-		--Mise à jour du seuil mini
+		--Mise Ã  jour du seuil mini
 		else
 			begin
 			begin transaction
@@ -1038,13 +1038,13 @@ declare @code_retour int;
 				where Modele = @modele
 				and Categorie = @categorie;
 
-				set @message = 'Le seuil à été modifié pour le modèle '+ CONVERT (varchar(10),@modele) +' - ' +CONVERT (varchar(10),@categorie) + '. Nouveau seuil : ' + CONVERT (varchar(10),@seuil);
+				set @message = 'Le seuil Ã  Ã©tÃ© modifiÃ© pour le modÃ¨le '+ CONVERT (varchar(10),@modele) +' - ' +CONVERT (varchar(10),@categorie) + '. Nouveau seuil : ' + CONVERT (varchar(10),@seuil);
 				set @code_retour = 0
 			commit transaction;	
 			end
 	end try
 	begin catch
-		set @message='erreur base de données' + ERROR_MESSAGE() ;
+		set @message='erreur base de donnÃ©es' + ERROR_MESSAGE() ;
 		set @code_retour=3;
 		rollback transaction;
 	end catch
@@ -1056,7 +1056,7 @@ go
 -- Creation des Vues
 ------------------------------------------------------------*/
 --Vue concernant les stocks
-CREATE VIEW VueStocksCategorie (Modele,Categorie,QuantitéStock,SeuilMini,DerniereCommande)
+CREATE VIEW VueStocksCategorie (Modele,Categorie,QuantitÃ©Stock,SeuilMini,DerniereCommande)
 AS SELECT *
 from STOCK
 GO
@@ -1071,14 +1071,14 @@ from STOCK
 where Seuil_Mini>=Quantite_Stock
 GO
 
---Vue des états presse
+--Vue des Ã©tats presse
 CREATE VIEW VueEtatPresse (NumPresse, EtatPresse)
 AS SELECT Num_Presse, Etat_Presse
 from MACHINE
-where Supprimée = 0
+where SupprimÃ©e = 0
 GO
 
---Vue des lots avec leurs états
+--Vue des lots avec leurs Ã©tats
 CREATE VIEW VueLotPresse (Lot,EtatLot,NumPresse,CodeEtat)
 AS SELECT LOT.Id_Lot, ETAT_LOT.Nom_Etat, MACHINE.Num_Presse, LOT.Code_Etat
 from LOT 
@@ -1086,8 +1086,8 @@ join ETAT_LOT on LOT.Code_Etat = ETAT_LOT.Code_Etat
 LEFT JOIN MACHINE on LOT.Num_Presse = MACHINE.Num_Presse
 GO
 
---Vue des lots lancés
-CREATE view VueLotsLances (LotsLancés, Modele, QuantitéDemandée)
+--Vue des lots lancÃ©s
+CREATE view VueLotsLances (LotsLancÃ©s, Modele, QuantitÃ©DemandÃ©e)
 as
 select Id_Lot, Modele, Nb_Pieces_Demandees
 from LOT
@@ -1095,7 +1095,7 @@ where Code_Etat = 1
 GO
 
 --Vue des lots demarrer
-CREATE View VueLotsDemarres (LotsDémarrés, Modèle, QuantitéDemandée, Presse)
+CREATE View VueLotsDemarres (LotsDÃ©marrÃ©s, ModÃ¨le, QuantitÃ©DemandÃ©e, Presse)
 as
 select Id_Lot, Modele, Nb_Pieces_demandees, LOT.Num_Presse
 from LOT
@@ -1125,6 +1125,13 @@ from LOT, ETAT_LOT, MACHINE
 where LOT.Code_Etat = ETAT_LOT.Code_Etat
 and LOT.Num_Presse = MACHINE.Num_Presse
 GO
+--Vue des stats pour le resp_qualitÃ©
+CREATE view vueStatistiques
+as
+select Id_Lot,Moyenne_HL,Moyenne_HT, Moyenne_BL, Moyenne_BT, Maximum_HL, Maximum_HT, Maximum_BL, Maximum_BT, Minimum_HL, Minimum_HT, Minimum_BL, Minimum_BT, Ecart_Type_HL, Ecart_Type_HT, Ecart_Type_BL, Ecart_Type_BT
+from LOT
+GO
+
 
 /*------------------------------------------------------------
 -- Creation de Fontion
@@ -1197,7 +1204,7 @@ DECLARE @login NVARCHAR(256), @user NVARCHAR(256), @role varchar(20);
 --recuperation du login courant
 SELECT @login = login_name FROM sys.dm_exec_sessions WHERE session_id = @@SPID;
 
---recuperation de l'user à partir du login
+--recuperation de l'user Ã  partir du login
 SELECT @user = d.name
   FROM sys.database_principals AS d
   INNER JOIN sys.server_principals AS s
@@ -1218,7 +1225,7 @@ SELECT @role = r.name
 END
 GO
 
---Fonction qui retourne une table de lots en fonction du modele selectionné
+--Fonction qui retourne une table de lots en fonction du modele selectionnÃ©
 CREATE FUNCTION fn_LotsSelect (@modele TypeModele) RETURNS table
 AS
 RETURN (SELECT * FROM LOT WHERE Modele = @modele)
