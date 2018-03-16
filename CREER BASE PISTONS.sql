@@ -854,6 +854,15 @@ declare @code_retour int;
 				set @message = 'Le modèle ' + CONVERT (varchar(10),@m_Modele) + ' n'' existe pas';
 				set @code_retour = 2;
 			end
+			--Verification si un lot utilise un modèle
+		else if exists (select  Code_Etat , LOT.Modele 
+						from MODELE
+						join LOT on MODELE.Modele = LOT.Modele 											
+						where MODELE.Modele = @Modele  and Code_Etat < 4)
+				begin
+					set @message = 'Ce modèle est encore utilisé par un lot'
+					set @code_retour = 2
+				end
 		--Suppression du modèle avec valeur à 1 pour "Supprimer"
 		else
 			begin
